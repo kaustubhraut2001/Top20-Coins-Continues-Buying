@@ -1,4 +1,4 @@
-import CryptoScanner from "../components/CryptoScanner"
+import CryptoScanner from "../app/components/CryptoScanner"
 
 export default function Home() {
   return (
