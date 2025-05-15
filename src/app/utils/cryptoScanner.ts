@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 const BINANCE_API_BASE = "https://api.binance.com/api/v3";
 
-interface CoinData {
+export interface CoinData {
   symbol: string;
   lastPrice: number;
   priceChangePercent: number;
