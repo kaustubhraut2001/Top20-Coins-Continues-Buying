@@ -17,7 +17,6 @@ async function checkThreeBullishAndRed(symbol: string): Promise<boolean> {
 		const data = await res.json()
 		if (!data || data.length < 4) return false
 
-		// Check first 3 days for bullish Marubozu
 		for (let i = 0;i < 3;i++) {
 			const [open, high, low, close] = data[i].slice(1, 5).map(Number)
 			const isBullishMarubozu =
@@ -28,7 +27,6 @@ async function checkThreeBullishAndRed(symbol: string): Promise<boolean> {
 			if (!isBullishMarubozu) return false
 		}
 
-		// Check 4th day (current) is red candle
 		const [currentOpen, , , currentClose] = data[3].slice(1, 5).map(Number)
 		return currentClose < currentOpen
 	} catch (err) {
@@ -56,7 +54,7 @@ async function fetchPatternCoins(): Promise<CoinData[]> {
 
 	return usdtCoins
 		.filter((coin: any) => matchedSymbols.has(coin.symbol))
-		.map((coin: any) => {
+		.map((coin: any): CoinData => {
 			const volume = parseFloat(coin.quoteVolume)
 			const priceChangePercent = parseFloat(coin.priceChangePercent)
 			const sellVolume = (volume * (1 - priceChangePercent / 100)) / 2
@@ -70,7 +68,7 @@ async function fetchPatternCoins(): Promise<CoinData[]> {
 				sellVolumePercent: ((1 - priceChangePercent / 100) / 2) * 100,
 			}
 		})
-		.sort((a, b) => b.sellVolumePercent - a.sellVolumePercent)
+		.sort((a: CoinData, b: CoinData) => b.sellVolumePercent - a.sellVolumePercent)
 		.slice(0, 20)
 }
 
@@ -100,7 +98,28 @@ const MarubuzuPattern: React.FC = () => {
 				<p>No matching coins found.</p>
 			) : (
 				<table className="w-full table-auto border-collapse border border-gray-300">
-					{/* Table body remains same as before */}
+					<thead>
+						<tr className="bg-gray-100">
+							<th className="border border-gray-300 px-4 py-2">Symbol</th>
+							<th className="border border-gray-300 px-4 py-2">Last Price</th>
+							<th className="border border-gray-300 px-4 py-2">24h %</th>
+							<th className="border border-gray-300 px-4 py-2">Volume</th>
+							<th className="border border-gray-300 px-4 py-2">Sell Volume</th>
+							<th className="border border-gray-300 px-4 py-2">Sell Volume %</th>
+						</tr>
+					</thead>
+					<tbody>
+						{coins.map((coin) => (
+							<tr key={coin.symbol}>
+								<td className="border border-gray-300 px-4 py-2">{coin.symbol}</td>
+								<td className="border border-gray-300 px-4 py-2">{coin.lastPrice.toFixed(4)}</td>
+								<td className="border border-gray-300 px-4 py-2">{coin.priceChangePercent.toFixed(2)}%</td>
+								<td className="border border-gray-300 px-4 py-2">{coin.volume.toFixed(2)}</td>
+								<td className="border border-gray-300 px-4 py-2">{coin.sellVolume.toFixed(2)}</td>
+								<td className="border border-gray-300 px-4 py-2">{coin.sellVolumePercent.toFixed(2)}%</td>
+							</tr>
+						))}
+					</tbody>
 				</table>
 			)}
 		</div>
